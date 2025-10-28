@@ -1,0 +1,29 @@
+Bestellung anlegen
+Das System muss es dem Verkäufer ermöglichen, neue Bestellungen manuell mit Kundendaten, Produktinformationen und Bestellnummer zu erfassen.
+
+Bestellübersicht anzeigen
+Das System soll eine Liste aller Bestellungen anzeigen, inklusive Bestellnummer, Kunde, Datum und aktuellem Versandstatus.
+
+Versandstatus aktualisieren
+Der Verkäufer muss den Versandstatus einer Bestellung (z. B. „in Bearbeitung“, „versendet“, „zugestellt“) ändern können.
+
+Such- und Filterfunktion
+Das System soll Bestellungen nach Kriterien wie Kunde, Bestellnummer oder Status durchsuchen und filtern können.
+
+Kundendaten verwalten
+Das System muss Kundendaten (Name, Adresse, E-Mail, Telefonnummer) speichern und bei Bedarf bearbeiten oder löschen können.
+
+Automatische Statusbenachrichtigung
+Beim Ändern des Versandstatus soll optional eine automatische E-Mail-Benachrichtigung an den Kunden gesendet werden.
+
+Exportfunktion für Berichte
+Das System soll Bestelldaten als CSV- oder PDF-Datei exportieren können (z. B. für Buchhaltung oder Versanddienstleister).
+
+Benutzerverwaltung
+Es soll verschiedene Benutzerrollen geben (z. B. Admin, Mitarbeiter) mit unterschiedlichen Berechtigungen.
+
+Integration von Versanddienstleistern (optional)
+Das System soll Schnittstellen zu Versanddienstleistern (z. B. DHL, Hermes) unterstützen, um Trackingnummern zu hinterlegen und aktuelle Versandinformationen abzurufen.
+
+Datensicherung und Wiederherstellung
+Das System soll regelmäßig Sicherungskopien der Bestelldaten erstellen und eine Wiederherstellungsfunktion anbieten.
