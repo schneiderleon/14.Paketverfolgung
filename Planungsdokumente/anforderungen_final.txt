@@ -1,15 +1,19 @@
 Bestellung anlegen
 Das System muss es dem Verkäufer ermöglichen, neue Bestellungen manuell mit Kundendaten, Produktinformationen und Bestellnummer zu erfassen.
+(10 stunden)
 
 Bestellübersicht anzeigen
 Das System soll eine Liste aller Bestellungen anzeigen, inklusive Bestellnummer, Kunde, Datum und aktuellem Versandstatus.
+(10 Stunden)
 
 Versandstatus aktualisieren
 Der Verkäufer muss den Versandstatus einer Bestellung (z. B. „in Bearbeitung“, „versendet“, „zugestellt“) ändern können.
+(5 Stunden)
 
 Such- und Filterfunktion
 Das System soll Bestellungen nach Kriterien wie Kunde, Bestellnummer oder Status durchsuchen und filtern können.
+(5 Stunden)
 
 Kundendaten verwalten
-Das System muss Kundendaten (Name, Adresse, E-Mail, Telefonnummer) speichern und bei Bedarf bearbeiten oder löschen können.
-
+Das System muss Kundendaten anlegen (Name, Adresse, E-Mail, Telefonnummer) speichern und bei Bedarf bearbeiten oder löschen können.
+(10 Stunden)
