@@ -17,3 +17,6 @@ Das System soll Bestellungen nach Kriterien wie Kunde, Bestellnummer oder Status
 Kundendaten verwalten
 Das System muss Kundendaten anlegen (Name, Adresse, E-Mail, Telefonnummer) speichern und bei Bedarf bearbeiten oder löschen können.
 (10 Stunden)
+
+Die 5 ausgewählten Funktionen sind erforderlich, um die Grundaufgaben des Programms umzusetzen.
+Mithilfe der ausgewählten Funktionen können Bestellungen und Kunden angelegt ,verwaltet und aktualisiert werden um den Kunden stets über den Status seiner/ihrer Bestellung in Kenntnis zu setzen.  
