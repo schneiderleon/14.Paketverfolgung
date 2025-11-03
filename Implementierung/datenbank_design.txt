@@ -1,0 +1,42 @@
+Anfang Prompt :
+
+Erstelle eine MS-SQL-Server Datenbank mit folgenden Bedingungen:
+
+falls Database nicht vorhanden, erstellen,
+alle Tabellen haben eine Primary Key,
+falls Tabelle schon vorhanden, neu anlegen und alte löschen,
+mindestens 5 insert Datensätze für Beispiele,
+am ende mit select und join Beispielausgabe generieren
+
+Die Datenbank wird für ein Paketverfolgungsprogramm genutzt.
+Erstelle die .SQL Datenbank.
+
+Ende Prompt.
+
+Warum habe ich diese Tabellen und Spalten gewählt?
+
+In der Paketverfolgung geht es hauptsächlich um 2 wichtige fragen.
+Wer hat bestellt und was wurde bestellt.
+Um Dopplungen zu verhindern, wird der Kontext so klein wie möglich gehalten.
+
+In der Tabelle "Kunde" werden die Kerninformationen des Kunden festgehalten und mit dem Primärschlüssel kann man den Kunden genau identifizieren. 
+
+KundeID Int
+Name String
+Adresse String
+Email String
+Tel.Nr. String
+
+In der Tabelle "Bestellung" wird festgehalten, welcher Kunde etwas bestimmtes bestellt hat.
+Hier kann man erkennen, dass von "Kunde" zu "Bestellung" eine 1 zu n Beziehung besteht.
+Das kommt daher, dass ein Kunde mehrere Bestellungen absetzen kann, jedoch hat jede Bestellung immer nur einen bestimmten Kunden ,zudem geliefert wird. Eine Bestellung gehört genau einem Kunden. Ein Kunde kann mehrere Bestellungen haben.
+
+BestellungID Int
+Bestelldatum Date
+Status String
+Produktname String
+KundeID Int
+
+Durch diese zwei Tabellen habe ich die wesentlichen Geschäftsprozesse der Paket-Verfolgung dargestellt und sie aus den funktionalen Anforderungen direkt abgeleitet.
+
+ 
