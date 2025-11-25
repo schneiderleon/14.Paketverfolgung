@@ -1,0 +1,41 @@
+1;Dieter ;Kiste;Erhalten
+1;Max Mustermann;USB-C Ladekabel 1m;in Bearbeitung
+2;Max Mustermann;USB-C Ladekabel 2m;versendet
+3;Max Mustermann;Powerbank 10.000mAh;zugestellt
+4;Erika Musterfrau;Gaming-Maus RGB;in Bearbeitung
+5;Erika Musterfrau;Mechanische Tastatur;versendet
+6;Hans Meier;Laptop 15 Zoll;zugestellt
+7;Hans Meier;Laptop-Tasche;zugestellt
+8;Hans Meier;HDMI-Kabel 3m;versendet
+9;Anna Schulz;Bluetooth-Kopfhörer;in Bearbeitung
+10;Anna Schulz;Smartwatch;versendet
+11;Peter Müller;Schreibtischlampe LED;zugestellt
+12;Peter Müller;Monitor 24 Zoll;zugestellt
+13;Peter Müller;Monitorhalterung;versendet
+14;Julia Becker;Externe Festplatte 1TB;in Bearbeitung
+15;Julia Becker;USB-Stick 64GB;in Bearbeitung
+16;Julia Becker;Webcam Full HD;versendet
+17;Lukas Wagner;Gaming-Headset;zugestellt
+18;Lukas Wagner;Mauspad XXL;zugestellt
+19;Lukas Wagner;USB-Hub 4 Port;in Bearbeitung
+20;Sarah König;Smartphone Hülle;versendet
+21;Sarah König;Display-Schutzfolie;versendet
+22;Sarah König;Kopfhörer In-Ear;zugestellt
+23;Tobias Lange;Router WLAN;in Bearbeitung
+24;Tobias Lange;Netzwerkkabel 10m;versendet
+25;Tobias Lange;Switch 8 Port;zugestellt
+26;Laura Hoffmann;Tablet 10 Zoll;in Bearbeitung
+27;Laura Hoffmann;Tablet-Hülle;in Bearbeitung
+28;Laura Hoffmann;Stylus Pen;versendet
+29;Jonas Krüger;Drucker;zugestellt
+30;Jonas Krüger;Druckerpatronen;versendet
+31;Jonas Krüger;Kopierpapier 500 Blatt;zugestellt
+32;Mia Schneider;USB-C Dockingstation;in Bearbeitung
+33;Mia Schneider;LAN-Adapter;versendet
+34;Mia Schneider;Bluetooth-Adapter;zugestellt
+35;Felix Bauer;Grafikkarte;versendet
+36;Felix Bauer;Netzteil 650W;in Bearbeitung
+37;Felix Bauer;PC-Gehäuse;zugestellt
+38;Nina Vogel;Lautsprecher Set 2.1;in Bearbeitung
+39;Nina Vogel;Mikrofon USB;versendet
+40;Nina Vogel;Green Screen;zugestellt

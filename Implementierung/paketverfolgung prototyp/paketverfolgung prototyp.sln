@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.36408.4 d17.14
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Paketverfolgung Prototyp", "Paketverfolgung Prototyp\Paketverfolgung Prototyp.csproj", "{69A6D162-88DF-4A1D-B8BE-9CDF980969EE}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{69A6D162-88DF-4A1D-B8BE-9CDF980969EE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{69A6D162-88DF-4A1D-B8BE-9CDF980969EE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{69A6D162-88DF-4A1D-B8BE-9CDF980969EE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{69A6D162-88DF-4A1D-B8BE-9CDF980969EE}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {8697CAE5-3E04-4784-9840-A450CBA8949D}
+	EndGlobalSection
+EndGlobal

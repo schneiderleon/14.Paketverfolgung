@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "jUawj6GyWBQ=",
+  "success": true,
+  "projectFilePath": "C:\\Users\\thebi\\source\\repos\\Paketverfolgung Prototyp\\Paketverfolgung Prototyp\\Paketverfolgung Prototyp.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\thebi\\.nuget\\packages\\microsoft.visualstudio.azure.containers.tools.targets\\1.22.1\\microsoft.visualstudio.azure.containers.tools.targets.1.22.1.nupkg.sha512"
+  ],
+  "logs": []
+}
