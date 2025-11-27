@@ -39,4 +39,6 @@ KundeID Int
 
 Durch diese zwei Tabellen habe ich die wesentlichen Geschäftsprozesse der Paket-Verfolgung dargestellt und sie aus den funktionalen Anforderungen direkt abgeleitet.
 
- 
+Warum 1:n- oder n:m-Beziehungen?
+Ich verwende hauptsächlich 1:n-Beziehungen, weil ein übergeordnetes Objekt jeweils vielen untergeordneten Datensätzen zugeordnet werden kann, diese aber immer genau zu einem „Eltern“-Datensatz gehören.
+Eine n:m-Beziehung wäre nur dann nötig, wenn Datensätze sich gegenseitig mehrfach zuordnen lassen sollen.
