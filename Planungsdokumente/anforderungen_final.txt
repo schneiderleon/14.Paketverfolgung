@@ -20,3 +20,4 @@ Das System muss Kundendaten anlegen (Name, Adresse, E-Mail, Telefonnummer) speic
 
 Die 5 ausgewählten Funktionen sind erforderlich, um die Grundaufgaben des Programms umzusetzen.
 Mithilfe der ausgewählten Funktionen können Bestellungen und Kunden angelegt ,verwaltet und aktualisiert werden um den Kunden stets über den Status seiner/ihrer Bestellung in Kenntnis zu setzen.  
+(CRUD-Funktionen)
