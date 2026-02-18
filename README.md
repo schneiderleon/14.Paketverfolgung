@@ -3,6 +3,6 @@ Ein Tool für Betreiber kleiner Online-Shops zur Verwaltung von Bestellungen und
 
 ## Funktionen
 
-- Eingabe einer Sendungsnummer
-- Anzeige des aktuellen Paketstatus (z.B. „in Zustellung“, „im Verteilzentrum“, …)
+- Eingabe einer Kunden-ID oder Bestell-ID
+- Anzeige des aktuellen Paketstatus für jeweiligen Kunden oder Bestellung (z.B. „in Zustellung“, „im Verteilzentrum“, …)
 - Übersichtliche Darstellung der wichtigsten Infos zur Sendung
