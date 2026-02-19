@@ -13,7 +13,7 @@ public partial class PaketFenster : Window
         CbStatus.SelectedIndex = 0;
     }
 
-    private void BtnSearch_Click(object sender, RoutedEventArgs e)
+    private void Window_Loaded(object sender, RoutedEventArgs e)
     {
         TryLoadAll();
     }
