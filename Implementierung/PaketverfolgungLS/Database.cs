@@ -3,11 +3,11 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 
-namespace PaketverfolgungStep4;
+namespace Paketverfolgung;
 
 public static class Database
 {
-    // Wenn du NICHT LocalDB nutzt, ändere den Server-Teil.
+    
     private const string ConnectionString =
         "Server=(localdb)\\MSSQLLocalDB;Database=PaketverfolgungDB;Trusted_Connection=True;TrustServerCertificate=True";
 
@@ -18,28 +18,28 @@ public static class Database
         return con;
     }
 
-    // ---------------- Orders ----------------
+    
 
     public static List<OrderRow> GetOrders(string? search = null)
     {
         using var con = OpenConnection();
 
         var sql = @"
-SELECT 
-    b.BestellungID AS Id,
-    k.Name AS Customer,
-    b.Produktname AS Product,
-    b.Status AS Status,
-    CONVERT(varchar(10), b.Bestelldatum, 104) AS Date
-FROM Bestellung b
-JOIN Kunde k ON b.KundeID = k.KundeID
-WHERE (@q IS NULL OR @q = '' 
-       OR k.Name LIKE '%' + @q + '%'
-       OR b.Produktname LIKE '%' + @q + '%'
-       OR b.Status LIKE '%' + @q + '%'
-       OR CONVERT(varchar(10), b.Bestelldatum, 104) LIKE '%' + @q + '%')
-ORDER BY b.Bestelldatum DESC;
-";
+                SELECT 
+                b.BestellungID AS Id,
+                k.Name AS Customer,
+                b.Produktname AS Product,
+                b.Status AS Status,
+                CONVERT(varchar(10), b.Bestelldatum, 104) AS Date
+                FROM Bestellung b
+                JOIN Kunde k ON b.KundeID = k.KundeID
+                WHERE (@q IS NULL OR @q = '' 
+                OR k.Name LIKE '%' + @q + '%'
+                OR b.Produktname LIKE '%' + @q + '%'
+                OR b.Status LIKE '%' + @q + '%'
+                OR CONVERT(varchar(10), b.Bestelldatum, 104) LIKE '%' + @q + '%')
+                ORDER BY b.Bestelldatum DESC;
+                ";
         using var cmd = new SqlCommand(sql, con);
         cmd.Parameters.Add("@q", SqlDbType.NVarChar, 200).Value = (object?)(search?.Trim()) ?? DBNull.Value;
 
@@ -63,10 +63,10 @@ ORDER BY b.Bestelldatum DESC;
     {
         using var con = OpenConnection();
         var sql = @"
-SELECT BestellungID, Bestelldatum, Status, Produktname, KundeID
-FROM Bestellung
-WHERE BestellungID = @id;
-";
+                SELECT BestellungID, Bestelldatum, Status, Produktname, KundeID
+                FROM Bestellung
+                WHERE BestellungID = @id;
+                ";
         using var cmd = new SqlCommand(sql, con);
         cmd.Parameters.Add("@id", SqlDbType.Int).Value = orderId;
 
@@ -88,10 +88,10 @@ WHERE BestellungID = @id;
     {
         using var con = OpenConnection();
         var sql = @"
-INSERT INTO Bestellung (Bestelldatum, Status, Produktname, KundeID)
-VALUES (@d, @s, @p, @k);
-SELECT SCOPE_IDENTITY();
-";
+                INSERT INTO Bestellung (Bestelldatum, Status, Produktname, KundeID)
+                VALUES (@d, @s, @p, @k);
+                SELECT SCOPE_IDENTITY();
+                ";
         using var cmd = new SqlCommand(sql, con);
         cmd.Parameters.Add("@d", SqlDbType.Date).Value = bestelldatum.Date;
         cmd.Parameters.Add("@s", SqlDbType.NVarChar, 50).Value = status;
@@ -106,13 +106,13 @@ SELECT SCOPE_IDENTITY();
     {
         using var con = OpenConnection();
         var sql = @"
-UPDATE Bestellung
-SET Bestelldatum = @d,
-    Status = @s,
-    Produktname = @p,
-    KundeID = @k
-WHERE BestellungID = @id;
-";
+                UPDATE Bestellung
+                SET Bestelldatum = @d,
+                Status = @s,
+                Produktname = @p,
+                KundeID = @k
+                WHERE BestellungID = @id;
+                ";
         using var cmd = new SqlCommand(sql, con);
         cmd.Parameters.Add("@d", SqlDbType.Date).Value = bestelldatum.Date;
         cmd.Parameters.Add("@s", SqlDbType.NVarChar, 50).Value = status;
@@ -136,11 +136,11 @@ WHERE BestellungID = @id;
     {
         using var con = OpenConnection();
         var sql = @"
-SELECT BestellungID, Produktname, Status, Bestelldatum
-FROM Bestellung
-WHERE KundeID = @id
-ORDER BY Bestelldatum DESC;
-";
+                SELECT BestellungID, Produktname, Status, Bestelldatum
+                FROM Bestellung
+                WHERE KundeID = @id
+                ORDER BY Bestelldatum DESC;
+                ";
         using var cmd = new SqlCommand(sql, con);
         cmd.Parameters.Add("@id", SqlDbType.Int).Value = kundeId;
 
@@ -168,16 +168,16 @@ ORDER BY Bestelldatum DESC;
         return cmd.ExecuteNonQuery();
     }
 
-    // ---------------- Customers ----------------
+    
 
     public static List<CustomerRow> GetCustomers()
     {
         using var con = OpenConnection();
         var sql = @"
-SELECT KundeID AS Id, Name, Adresse, EMail AS Email, Telefonnummer AS Phone
-FROM Kunde
-ORDER BY KundeID;
-";
+                SELECT KundeID AS Id, Name, Adresse, EMail AS Email, Telefonnummer AS Phone
+                FROM Kunde
+                ORDER BY KundeID;
+                ";
         using var cmd = new SqlCommand(sql, con);
 
         using var r = cmd.ExecuteReader();
@@ -230,10 +230,10 @@ ORDER BY KundeID;
     {
         using var con = OpenConnection();
         var sql = @"
-INSERT INTO Kunde (Name, Adresse, EMail, Telefonnummer)
-VALUES (@n, @a, @e, @t);
-SELECT SCOPE_IDENTITY();
-";
+                INSERT INTO Kunde (Name, Adresse, EMail, Telefonnummer)
+                VALUES (@n, @a, @e, @t);
+                SELECT SCOPE_IDENTITY();
+                ";
         using var cmd = new SqlCommand(sql, con);
         cmd.Parameters.Add("@n", SqlDbType.NVarChar, 100).Value = name;
         cmd.Parameters.Add("@a", SqlDbType.NVarChar, 200).Value = (object?)adresse ?? DBNull.Value;
@@ -248,10 +248,10 @@ SELECT SCOPE_IDENTITY();
     {
         using var con = OpenConnection();
         var sql = @"
-SELECT KundeID, Name, Adresse, EMail, Telefonnummer
-FROM Kunde
-WHERE KundeID = @id;
-";
+                SELECT KundeID, Name, Adresse, EMail, Telefonnummer
+                FROM Kunde
+                WHERE KundeID = @id;
+                ";
         using var cmd = new SqlCommand(sql, con);
         cmd.Parameters.Add("@id", SqlDbType.Int).Value = kundeId;
 
@@ -273,13 +273,13 @@ WHERE KundeID = @id;
     {
         using var con = OpenConnection();
         var sql = @"
-UPDATE Kunde
-SET Name = @n,
-    Adresse = @a,
-    EMail = @e,
-    Telefonnummer = @t
-WHERE KundeID = @id;
-";
+                UPDATE Kunde
+                SET Name = @n,
+                Adresse = @a,
+                EMail = @e,
+                Telefonnummer = @t
+                WHERE KundeID = @id;
+                ";
         using var cmd = new SqlCommand(sql, con);
         cmd.Parameters.Add("@n", SqlDbType.NVarChar, 100).Value = name;
         cmd.Parameters.Add("@a", SqlDbType.NVarChar, 200).Value = (object?)adresse ?? DBNull.Value;
@@ -300,7 +300,7 @@ WHERE KundeID = @id;
     }
 }
 
-// ---------------- DTOs (für DataGrid Binding) ----------------
+
 
 public class OrderRow
 {
