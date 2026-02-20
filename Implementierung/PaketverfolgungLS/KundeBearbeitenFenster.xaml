@@ -72,10 +72,10 @@
                           RowHeaderWidth="0"
                           MinHeight="180">
                     <DataGrid.Columns>
-                        <DataGridTextColumn Header="Bestell ID" Width="90"/>
-                        <DataGridTextColumn Header="Produktname" Width="*"/>
-                        <DataGridTextColumn Header="Status" Width="140"/>
-                        <DataGridTextColumn Header="Datum"  Width="120"/>
+                        <DataGridTextColumn Header="Bestell ID"  Binding="{Binding Id}" Width="90"/>
+                        <DataGridTextColumn Header="Produktname" Binding="{Binding Product}" Width="*"/>
+                        <DataGridTextColumn Header="Status" Binding="{Binding Status}" Width="140"/>
+                        <DataGridTextColumn Header="Datum" Binding="{Binding Date}" Width="120"/>
                     </DataGrid.Columns>
                 </DataGrid>
             </Border>
