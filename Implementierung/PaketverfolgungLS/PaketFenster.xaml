@@ -67,11 +67,11 @@
                               RowHeaderWidth="0"
                               MinHeight="140">
                         <DataGrid.Columns>
-                            <DataGridTextColumn Header="ID" Width="60"/>
-                            <DataGridTextColumn Header="Kunde"  Width="*"/>
-                            <DataGridTextColumn Header="Produktname"  Width="*"/>
-                            <DataGridTextColumn Header="Status" Width="140"/>
-                            <DataGridTextColumn Header="Datum"  Width="140"/>
+                            <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="60"/>
+                            <DataGridTextColumn Header="Kunde" Binding="{Binding Customer}" Width="*"/>
+                            <DataGridTextColumn Header="Produktname" Binding="{Binding Product}" Width="*"/>
+                            <DataGridTextColumn Header="Status" Binding="{Binding Status}" Width="140"/>
+                            <DataGridTextColumn Header="Datum" Binding="{Binding Date}" Width="140"/>
                         </DataGrid.Columns>
                     </DataGrid>
                 </Border>
@@ -143,11 +143,11 @@
                               RowHeaderWidth="0"
                               MinHeight="140">
                         <DataGrid.Columns>
-                            <DataGridTextColumn Header="ID" Width="60"/>
-                            <DataGridTextColumn Header="Kunde" Width="*"/>
-                            <DataGridTextColumn Header="Adresse" Width="*"/>
-                            <DataGridTextColumn Header="E-Mail" Width="260"/>
-                            <DataGridTextColumn Header="Telefon"  Width="140"/>
+                            <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="60"/>
+                            <DataGridTextColumn Header="Kunde" Binding="{Binding Name}" Width="*"/>
+                            <DataGridTextColumn Header="Adresse" Binding="{Binding Address}" Width="*"/>
+                            <DataGridTextColumn Header="E-Mail" Binding="{Binding Email}" Width="260"/>
+                            <DataGridTextColumn Header="Telefon" Binding="{Binding Phone}" Width="140"/>
                         </DataGrid.Columns>
                     </DataGrid>
                 </Border>
