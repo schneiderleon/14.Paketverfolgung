@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Paketverfolgung" Height="820" Width="1120"
         WindowStartupLocation="CenterScreen"
-        >
+        Loaded = "Window_Loaded">
 
     <ScrollViewer VerticalScrollBarVisibility="Auto">
         <Grid Margin="16">
