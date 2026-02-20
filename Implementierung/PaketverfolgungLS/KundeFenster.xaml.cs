@@ -1,4 +1,3 @@
-using Microsoft.Data.SqlClient;
 using System;
 using System.Windows;
 
@@ -36,14 +35,11 @@ public partial class KundeFenster : Window
             DialogResult = true;
             Close();
         }
-        catch (SqlException ex)
+        catch (Exception ex)
         {
             MessageBox.Show(ex.Message, "DB Fehler");
         }
-        catch (Exception ex)
-        {
-            MessageBox.Show(ex.Message, "Fehler");
-        }
+        
     }
 
     private void BtnCancel_Click(object sender, RoutedEventArgs e)

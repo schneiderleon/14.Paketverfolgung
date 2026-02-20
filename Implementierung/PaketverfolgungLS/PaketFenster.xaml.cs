@@ -1,4 +1,3 @@
-using Microsoft.Data.SqlClient;
 using System;
 using System.Windows;
 
@@ -20,43 +19,34 @@ public partial class PaketFenster : Window
 
     private void TryLoadAll()
     {
-    try
+        try
         {
             DgOrders.ItemsSource = Database.GetOrders();
             DgCustomers.ItemsSource = Database.GetCustomers();
         }
-    catch (SqlException ex)
+        catch (Exception ex)
         {
-            MessageBox.Show
-            (
-            "Datenbankverbindung fehlgeschlagen.\n\n" +            
-            ex.Message,
-            "DB Fehler"
-            );
+            MessageBox.Show(
+                "Datenbankverbindung fehlgeschlagen.\n\n" +               
+                ex.Message,
+                "DB Fehler");
         }
-    catch (Exception ex)
-        {
-        MessageBox.Show
-            (
-            ex.Message,
-             "Fehler"
-            );
-        }
+       
     }
 
     private void BtnSearch_Click(object sender, RoutedEventArgs e)
     {
-    try
+        try
         {
-        DgOrders.ItemsSource = Database.GetOrders(TbSearch.Text);
+            DgOrders.ItemsSource = Database.GetOrders(TbSearch.Text);
         }
-    catch (Exception ex)
+        catch (Exception ex)
         {
-        MessageBox.Show(ex.Message, "Fehler");
+            MessageBox.Show(ex.Message, "Fehler");
         }
     }
 
-     private void BtnReset_Click(object sender, RoutedEventArgs e)
+    private void BtnReset_Click(object sender, RoutedEventArgs e)
     {
         TbSearch.Text = "";
         TryLoadAll();
@@ -79,8 +69,8 @@ public partial class PaketFenster : Window
     {
         if (!int.TryParse((TbEditOrderId.Text ?? "").Trim(), out var orderId))
         {
-        MessageBox.Show("Bitte eine gültige Bestell ID eingeben (Zahl).", "Fehler");
-        return;
+            MessageBox.Show("Bitte eine gültige Bestell ID eingeben (Zahl).", "Fehler");
+            return;
         }
 
         OpenEditOrder(orderId);
@@ -90,7 +80,7 @@ public partial class PaketFenster : Window
     {
         if (DgOrders.SelectedItem is OrderRow row)
         {
-        OpenEditOrder(row.Id);
+            OpenEditOrder(row.Id);
         }
     }
 
@@ -101,7 +91,7 @@ public partial class PaketFenster : Window
 
         var ok = win.ShowDialog();
         if (ok == true)
-        TryLoadAll();
+            TryLoadAll();
     }
 
     private void BtnSaveOrder_Click(object sender, RoutedEventArgs e)
@@ -130,23 +120,19 @@ public partial class PaketFenster : Window
                 return;
             }
 
-                Database.InsertOrder(kundeId, date, status, produkt);
+            Database.InsertOrder(kundeId, date, status, produkt);
 
-                TbCustomerId.Text = "";
-                TbProductName.Text = "";
-                DpOrderDate.SelectedDate = DateTime.Today;
-                CbStatus.SelectedIndex = 0;
+            TbCustomerId.Text = "";
+            TbProductName.Text = "";
+            DpOrderDate.SelectedDate = DateTime.Today;
+            CbStatus.SelectedIndex = 0;
 
-                TryLoadAll();
-        }
-        catch (SqlException ex)
-        {
-            MessageBox.Show(ex.Message, "DB Fehler");
+            TryLoadAll();
         }
         catch (Exception ex)
         {
-            MessageBox.Show(ex.Message, "Fehler");
-        }
+            MessageBox.Show(ex.Message, "DB Fehler");
+        }      
     }
 
     private void BtnCancelOrder_Click(object sender, RoutedEventArgs e)
@@ -159,31 +145,31 @@ public partial class PaketFenster : Window
 
     private void BtnEditCustomer_Click(object sender, RoutedEventArgs e)
     {
-        if (!int.TryParse((TbEditCustomerId.Text ?? "").Trim(), out var kundeId))
-        {
-            MessageBox.Show("Bitte eine gültige Kunden ID eingeben (Zahl).", "Fehler");
-            return;
-        }
-
-        var win = new KundeBearbeitenFenster(kundeId);
-        win.Owner = this;
-
-        var ok = win.ShowDialog();
-        if (ok == true)        
-        TryLoadAll();
-        
+    if (!int.TryParse((TbEditCustomerId.Text ?? "").Trim(), out var kundeId))
+    {
+        MessageBox.Show("Bitte eine gültige Kunden ID eingeben (Zahl).", "Fehler");
+        return;
     }
+
+    var win = new KundeBearbeitenFenster(kundeId);
+    win.Owner = this;
+
+    var ok = win.ShowDialog();
+    if (ok == true)
+        TryLoadAll();
+    }
+
 
     private void DgCustomers_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
     {
-         if (DgCustomers.SelectedItem is CustomerRow row)
-        {
-            var win = new KundeBearbeitenFenster(row.Id);
-            win.Owner = this;
-            var ok = win.ShowDialog();
-            if (ok == true)
+    if (DgCustomers.SelectedItem is CustomerRow row)
+    {
+        var win = new KundeBearbeitenFenster(row.Id);
+        win.Owner = this;
+        var ok = win.ShowDialog();
+        if (ok == true)
             TryLoadAll();
-        }
+    }
     }
 
 }

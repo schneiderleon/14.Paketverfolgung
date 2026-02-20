@@ -1,4 +1,3 @@
-using Microsoft.Data.SqlClient;
 using System;
 using System.Windows;
 
@@ -42,16 +41,12 @@ public partial class KundeBearbeitenFenster : Window
 
             TbName.Focus();
         }
-        catch (SqlException ex)
+        catch (Exception ex)
         {
             MessageBox.Show(ex.Message, "DB Fehler");
             Close();
         }
-        catch (Exception ex)
-        {
-            MessageBox.Show(ex.Message, "Fehler");
-            Close();
-        }
+        
     }
 
     private void LoadOrders()
@@ -60,14 +55,11 @@ public partial class KundeBearbeitenFenster : Window
         {
             DgCustomerOrders.ItemsSource = Database.GetOrdersByCustomerId(_kundeId);
         }
-        catch (SqlException ex)
+        catch (Exception ex)
         {
             MessageBox.Show(ex.Message, "DB Fehler");
         }
-        catch (Exception ex)
-        {
-            MessageBox.Show(ex.Message, "Fehler");
-        }
+        
     }
 
     private void BtnSave_Click(object sender, RoutedEventArgs e)
@@ -101,19 +93,16 @@ public partial class KundeBearbeitenFenster : Window
             DialogResult = true;
             Close();
         }
-        catch (SqlException ex)
+        catch (Exception ex)
         {
             MessageBox.Show(ex.Message, "DB Fehler");
         }
-        catch (Exception ex)
-        {
-            MessageBox.Show(ex.Message, "Fehler");
-        }
+        
     }
 
     private void BtnDelete_Click(object sender, RoutedEventArgs e)
     {
-        // Option anbieten: Bestellungen vorher löschen?
+        
         var result = MessageBox.Show(
             "Kunde löschen:\n\n" +
             "Möchtest du vorher ALLE Bestellungen dieses Kunden löschen?\n\n" +
@@ -131,11 +120,11 @@ public partial class KundeBearbeitenFenster : Window
         {
             if (result == MessageBoxResult.Yes)
             {
-                // Erst Bestellungen löschen
+                
                 Database.DeleteOrdersByCustomerId(_kundeId);
             }
 
-            // Dann Kunde löschen
+            
             var rows = Database.DeleteCustomer(_kundeId);
             if (rows == 0)
             {
@@ -146,7 +135,7 @@ public partial class KundeBearbeitenFenster : Window
             DialogResult = true;
             Close();
         }
-        catch (SqlException ex)
+        catch (Exception ex)
         {
             MessageBox.Show(
                 "Kunde konnte nicht gelöscht werden.\n\n" +
@@ -155,10 +144,7 @@ public partial class KundeBearbeitenFenster : Window
                 ex.Message,
                 "DB Fehler");
         }
-        catch (Exception ex)
-        {
-            MessageBox.Show(ex.Message, "Fehler");
-        }
+        
     }
 
     private void BtnCancel_Click(object sender, RoutedEventArgs e)

@@ -1,302 +1,254 @@
-using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
+using Paketverfolgung.Models;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Globalization;DeletedRowInaccessibleException 
 
 namespace Paketverfolgung;
 
 public static class Database
 {
-    
-    private const string ConnectionString =
-        "Server=(localdb)\\MSSQLLocalDB;Database=PaketverfolgungDB;Trusted_Connection=True;TrustServerCertificate=True";
-
-    public static SqlConnection OpenConnection()
+    public static void EnsureCreatedAndSeeded()
     {
-        var con = new SqlConnection(ConnectionString);
-        con.Open();
-        return con;
+        using var db = new PaketverfolgungContext();
+        db.Database.EnsureCreated();
+
+        if (!db.Kunden.Any())
+        {
+            var k1 = new Kunde { Name = "Anna Müller", Adresse = "Hauptstr. 12", EMail = "anna@example.com", Telefonnummer = "030-123456" };
+            var k2 = new Kunde { Name = "Peter Schmidt", Adresse = "Bahnhofstr. 8", EMail = "peter@example.com", Telefonnummer = "040-987654" };
+            var k3 = new Kunde { Name = "Julia Becker", Adresse = "Marktplatz 5", EMail = "julia@example.com", Telefonnummer = "089-246810" };
+
+            db.Kunden.AddRange(k1, k2, k3);
+            db.SaveChanges();
+
+            db.Bestellungen.AddRange(
+                new Bestellung { KundeID = k1.KundeID, Produktname = "Bluetooth Kopfhörer", Status = "in Bearbeitung", Bestelldatum = DateTime.Today.AddDays(-2) },
+                new Bestellung { KundeID = k2.KundeID, Produktname = "USB-C Ladegerät", Status = "versendet", Bestelldatum = DateTime.Today.AddDays(-1) },
+                new Bestellung { KundeID = k3.KundeID, Produktname = "Laptop Tasche", Status = "zugestellt", Bestelldatum = DateTime.Today }
+            );
+
+            db.SaveChanges();
+        }
     }
 
     
 
     public static List<OrderRow> GetOrders(string? search = null)
     {
-        using var con = OpenConnection();
+        using var db = new PaketverfolgungContext();
 
-        var sql = @"
-                SELECT 
-                b.BestellungID AS Id,
-                k.Name AS Customer,
-                b.Produktname AS Product,
-                b.Status AS Status,
-                CONVERT(varchar(10), b.Bestelldatum, 104) AS Date
-                FROM Bestellung b
-                JOIN Kunde k ON b.KundeID = k.KundeID
-                WHERE (@q IS NULL OR @q = '' 
-                OR k.Name LIKE '%' + @q + '%'
-                OR b.Produktname LIKE '%' + @q + '%'
-                OR b.Status LIKE '%' + @q + '%'
-                OR CONVERT(varchar(10), b.Bestelldatum, 104) LIKE '%' + @q + '%')
-                ORDER BY b.Bestelldatum DESC;
-                ";
-        using var cmd = new SqlCommand(sql, con);
-        cmd.Parameters.Add("@q", SqlDbType.NVarChar, 200).Value = (object?)(search?.Trim()) ?? DBNull.Value;
+        var q = db.Bestellungen
+            .AsNoTracking()
+            .Include(b => b.Kunde)
+            .AsQueryable();
 
-        using var r = cmd.ExecuteReader();
-        var list = new List<OrderRow>();
-        while (r.Read())
+        var s = (search ?? "").Trim();
+        if (s.Length > 0)
         {
-            list.Add(new OrderRow
-            {
-                Id = r.GetInt32(0),
-                Customer = r.GetString(1),
-                Product = r.GetString(2),
-                Status = r.GetString(3),
-                Date = r.GetString(4),
-            });
+            var hasDate = DateTime.TryParse(s, CultureInfo.CurrentCulture, DateTimeStyles.None, out var dt);
+
+            q = q.Where(b =>
+                EF.Functions.Like(b.Kunde!.Name, $"%{s}%") ||
+                EF.Functions.Like(b.Produktname, $"%{s}%") ||
+                EF.Functions.Like(b.Status, $"%{s}%") ||
+                (hasDate && b.Bestelldatum.Date == dt.Date));
         }
-        return list;
+
+        return q.OrderByDescending(b => b.Bestelldatum)
+            .Select(b => new OrderRow
+            {
+                Id = b.BestellungID,
+                Customer = b.Kunde!.Name,
+                Product = b.Produktname,
+                Status = b.Status,
+                Date = b.Bestelldatum.ToString("dd.MM.yyyy")
+            })
+            .ToList();
     }
 
     public static OrderEditRow? GetOrderById(int orderId)
     {
-        using var con = OpenConnection();
-        var sql = @"
-                SELECT BestellungID, Bestelldatum, Status, Produktname, KundeID
-                FROM Bestellung
-                WHERE BestellungID = @id;
-                ";
-        using var cmd = new SqlCommand(sql, con);
-        cmd.Parameters.Add("@id", SqlDbType.Int).Value = orderId;
+        using var db = new PaketverfolgungContext();
 
-        using var r = cmd.ExecuteReader();
-        if (!r.Read())
-            return null;
-
-        return new OrderEditRow
-        {
-            Id = r.GetInt32(0),
-            OrderDate = r.GetDateTime(1),
-            Status = r.GetString(2),
-            Product = r.GetString(3),
-            CustomerId = r.GetInt32(4)
-        };
+        return db.Bestellungen.AsNoTracking()
+            .Where(b => b.BestellungID == orderId)
+            .Select(b => new OrderEditRow
+            {
+                Id = b.BestellungID,
+                CustomerId = b.KundeID,
+                Product = b.Produktname,
+                Status = b.Status,
+                OrderDate = b.Bestelldatum
+            })
+            .FirstOrDefault();
     }
 
     public static int InsertOrder(int kundeId, DateTime bestelldatum, string status, string produktname)
     {
-        using var con = OpenConnection();
-        var sql = @"
-                INSERT INTO Bestellung (Bestelldatum, Status, Produktname, KundeID)
-                VALUES (@d, @s, @p, @k);
-                SELECT SCOPE_IDENTITY();
-                ";
-        using var cmd = new SqlCommand(sql, con);
-        cmd.Parameters.Add("@d", SqlDbType.Date).Value = bestelldatum.Date;
-        cmd.Parameters.Add("@s", SqlDbType.NVarChar, 50).Value = status;
-        cmd.Parameters.Add("@p", SqlDbType.NVarChar, 100).Value = produktname;
-        cmd.Parameters.Add("@k", SqlDbType.Int).Value = kundeId;
+        using var db = new PaketverfolgungContext();
 
-        var idObj = cmd.ExecuteScalar();
-        return Convert.ToInt32(idObj);
+        var entity = new Bestellung
+        {
+            KundeID = kundeId,
+            Bestelldatum = bestelldatum.Date,
+            Status = status,
+            Produktname = produktname
+        };
+
+        db.Bestellungen.Add(entity);
+        db.SaveChanges();
+        return entity.BestellungID;
     }
 
     public static int UpdateOrder(int orderId, int kundeId, DateTime bestelldatum, string status, string produktname)
     {
-        using var con = OpenConnection();
-        var sql = @"
-                UPDATE Bestellung
-                SET Bestelldatum = @d,
-                Status = @s,
-                Produktname = @p,
-                KundeID = @k
-                WHERE BestellungID = @id;
-                ";
-        using var cmd = new SqlCommand(sql, con);
-        cmd.Parameters.Add("@d", SqlDbType.Date).Value = bestelldatum.Date;
-        cmd.Parameters.Add("@s", SqlDbType.NVarChar, 50).Value = status;
-        cmd.Parameters.Add("@p", SqlDbType.NVarChar, 100).Value = produktname;
-        cmd.Parameters.Add("@k", SqlDbType.Int).Value = kundeId;
-        cmd.Parameters.Add("@id", SqlDbType.Int).Value = orderId;
+        using var db = new PaketverfolgungContext();
 
-        return cmd.ExecuteNonQuery();
+        var entity = db.Bestellungen.FirstOrDefault(b => b.BestellungID == orderId);
+        if (entity is null) return 0;
+
+        entity.KundeID = kundeId;
+        entity.Bestelldatum = bestelldatum.Date;
+        entity.Status = status;
+        entity.Produktname = produktname;
+
+        return db.SaveChanges();
     }
 
     public static int DeleteOrder(int orderId)
     {
-        using var con = OpenConnection();
-        var sql = @"DELETE FROM Bestellung WHERE BestellungID = @id;";
-        using var cmd = new SqlCommand(sql, con);
-        cmd.Parameters.Add("@id", SqlDbType.Int).Value = orderId;
-        return cmd.ExecuteNonQuery();
+        using var db = new PaketverfolgungContext();
+
+        var entity = db.Bestellungen.FirstOrDefault(b => b.BestellungID == orderId);
+        if (entity is null) return 0;
+
+        db.Bestellungen.Remove(entity);
+        return db.SaveChanges();
     }
 
     public static List<OrderMiniRow> GetOrdersByCustomerId(int kundeId)
     {
-        using var con = OpenConnection();
-        var sql = @"
-                SELECT BestellungID, Produktname, Status, Bestelldatum
-                FROM Bestellung
-                WHERE KundeID = @id
-                ORDER BY Bestelldatum DESC;
-                ";
-        using var cmd = new SqlCommand(sql, con);
-        cmd.Parameters.Add("@id", SqlDbType.Int).Value = kundeId;
+        using var db = new PaketverfolgungContext();
 
-        using var r = cmd.ExecuteReader();
-        var list = new List<OrderMiniRow>();
-        while (r.Read())
-        {
-            list.Add(new OrderMiniRow
+        return db.Bestellungen.AsNoTracking()
+            .Where(b => b.KundeID == kundeId)
+            .OrderByDescending(b => b.Bestelldatum)
+            .Select(b => new OrderMiniRow
             {
-                Id = r.GetInt32(0),
-                Product = r.GetString(1),
-                Status = r.GetString(2),
-                OrderDate = r.GetDateTime(3)
-            });
-        }
-        return list;
+                Id = b.BestellungID,
+                Product = b.Produktname,
+                Status = b.Status,
+                OrderDate = b.Bestelldatum
+            })
+            .ToList();
     }
 
     public static int DeleteOrdersByCustomerId(int kundeId)
     {
-        using var con = OpenConnection();
-        var sql = @"DELETE FROM Bestellung WHERE KundeID = @id;";
-        using var cmd = new SqlCommand(sql, con);
-        cmd.Parameters.Add("@id", SqlDbType.Int).Value = kundeId;
-        return cmd.ExecuteNonQuery();
+        using var db = new PaketverfolgungContext();
+
+        var orders = db.Bestellungen.Where(b => b.KundeID == kundeId).ToList();
+        if (orders.Count == 0) return 0;
+
+        db.Bestellungen.RemoveRange(orders);
+        return db.SaveChanges();
     }
 
     
 
     public static List<CustomerRow> GetCustomers()
     {
-        using var con = OpenConnection();
-        var sql = @"
-                SELECT KundeID AS Id, Name, Adresse, EMail AS Email, Telefonnummer AS Phone
-                FROM Kunde
-                ORDER BY KundeID;
-                ";
-        using var cmd = new SqlCommand(sql, con);
+        using var db = new PaketverfolgungContext();
 
-        using var r = cmd.ExecuteReader();
-        var list = new List<CustomerRow>();
-        while (r.Read())
-        {
-            list.Add(new CustomerRow
+        return db.Kunden.AsNoTracking()
+            .OrderBy(k => k.KundeID)
+            .Select(k => new CustomerRow
             {
-                Id = r.GetInt32(0),
-                Name = r.GetString(1),
-                Address = r.IsDBNull(2) ? "" : r.GetString(2),
-                Email = r.IsDBNull(3) ? "" : r.GetString(3),
-                Phone = r.IsDBNull(4) ? "" : r.GetString(4),
-            });
-        }
-        return list;
+                Id = k.KundeID,
+                Name = k.Name,
+                Address = k.Adresse ?? "",
+                Email = k.EMail ?? "",
+                Phone = k.Telefonnummer ?? ""
+            })
+            .ToList();
     }
 
     public static List<CustomerLookup> GetCustomerLookup()
     {
-        using var con = OpenConnection();
-        var sql = @"SELECT KundeID, Name FROM Kunde ORDER BY Name;";
-        using var cmd = new SqlCommand(sql, con);
+        using var db = new PaketverfolgungContext();
 
-        using var r = cmd.ExecuteReader();
-        var list = new List<CustomerLookup>();
-        while (r.Read())
-        {
-            list.Add(new CustomerLookup
-            {
-                Id = r.GetInt32(0),
-                Name = r.GetString(1)
-            });
-        }
-        return list;
+        return db.Kunden.AsNoTracking()
+            .OrderBy(k => k.Name)
+            .Select(k => new CustomerLookup { Id = k.KundeID, Name = k.Name })
+            .ToList();
     }
 
     public static bool CustomerExists(int kundeId)
     {
-        using var con = OpenConnection();
-        var sql = @"SELECT COUNT(1) FROM Kunde WHERE KundeID = @id;";
-        using var cmd = new SqlCommand(sql, con);
-        cmd.Parameters.Add("@id", SqlDbType.Int).Value = kundeId;
-
-        var count = (int)cmd.ExecuteScalar()!;
-        return count > 0;
+        using var db = new PaketverfolgungContext();
+        return db.Kunden.AsNoTracking().Any(k => k.KundeID == kundeId);
     }
 
     public static int InsertCustomer(string name, string? adresse, string? email, string? phone)
     {
-        using var con = OpenConnection();
-        var sql = @"
-                INSERT INTO Kunde (Name, Adresse, EMail, Telefonnummer)
-                VALUES (@n, @a, @e, @t);
-                SELECT SCOPE_IDENTITY();
-                ";
-        using var cmd = new SqlCommand(sql, con);
-        cmd.Parameters.Add("@n", SqlDbType.NVarChar, 100).Value = name;
-        cmd.Parameters.Add("@a", SqlDbType.NVarChar, 200).Value = (object?)adresse ?? DBNull.Value;
-        cmd.Parameters.Add("@e", SqlDbType.NVarChar, 100).Value = (object?)email ?? DBNull.Value;
-        cmd.Parameters.Add("@t", SqlDbType.NVarChar, 50).Value = (object?)phone ?? DBNull.Value;
+        using var db = new PaketverfolgungContext();
 
-        var idObj = cmd.ExecuteScalar();
-        return Convert.ToInt32(idObj);
+        var entity = new Kunde
+        {
+            Name = name,
+            Adresse = adresse,
+            EMail = email,
+            Telefonnummer = phone
+        };
+
+        db.Kunden.Add(entity);
+        db.SaveChanges();
+        return entity.KundeID;
     }
 
     public static CustomerEditRow? GetCustomerById(int kundeId)
     {
-        using var con = OpenConnection();
-        var sql = @"
-                SELECT KundeID, Name, Adresse, EMail, Telefonnummer
-                FROM Kunde
-                WHERE KundeID = @id;
-                ";
-        using var cmd = new SqlCommand(sql, con);
-        cmd.Parameters.Add("@id", SqlDbType.Int).Value = kundeId;
+        using var db = new PaketverfolgungContext();
 
-        using var r = cmd.ExecuteReader();
-        if (!r.Read())
-            return null;
-
-        return new CustomerEditRow
-        {
-            Id = r.GetInt32(0),
-            Name = r.GetString(1),
-            Address = r.IsDBNull(2) ? "" : r.GetString(2),
-            Email = r.IsDBNull(3) ? "" : r.GetString(3),
-            Phone = r.IsDBNull(4) ? "" : r.GetString(4)
-        };
+        return db.Kunden.AsNoTracking()
+            .Where(k => k.KundeID == kundeId)
+            .Select(k => new CustomerEditRow
+            {
+                Id = k.KundeID,
+                Name = k.Name,
+                Address = k.Adresse ?? "",
+                Email = k.EMail ?? "",
+                Phone = k.Telefonnummer ?? ""
+            })
+            .FirstOrDefault();
     }
 
     public static int UpdateCustomer(int kundeId, string name, string? adresse, string? email, string? phone)
     {
-        using var con = OpenConnection();
-        var sql = @"
-                UPDATE Kunde
-                SET Name = @n,
-                Adresse = @a,
-                EMail = @e,
-                Telefonnummer = @t
-                WHERE KundeID = @id;
-                ";
-        using var cmd = new SqlCommand(sql, con);
-        cmd.Parameters.Add("@n", SqlDbType.NVarChar, 100).Value = name;
-        cmd.Parameters.Add("@a", SqlDbType.NVarChar, 200).Value = (object?)adresse ?? DBNull.Value;
-        cmd.Parameters.Add("@e", SqlDbType.NVarChar, 100).Value = (object?)email ?? DBNull.Value;
-        cmd.Parameters.Add("@t", SqlDbType.NVarChar, 50).Value = (object?)phone ?? DBNull.Value;
-        cmd.Parameters.Add("@id", SqlDbType.Int).Value = kundeId;
+        using var db = new PaketverfolgungContext();
 
-        return cmd.ExecuteNonQuery();
+        var entity = db.Kunden.FirstOrDefault(k => k.KundeID == kundeId);
+        if (entity is null) return 0;
+
+        entity.Name = name;
+        entity.Adresse = adresse;
+        entity.EMail = email;
+        entity.Telefonnummer = phone;
+
+        return db.SaveChanges();
     }
 
     public static int DeleteCustomer(int kundeId)
     {
-        using var con = OpenConnection();
-        var sql = @"DELETE FROM Kunde WHERE KundeID = @id;";
-        using var cmd = new SqlCommand(sql, con);
-        cmd.Parameters.Add("@id", SqlDbType.Int).Value = kundeId;
-        return cmd.ExecuteNonQuery();
+        using var db = new PaketverfolgungContext();
+
+        var entity = db.Kunden.FirstOrDefault(k => k.KundeID == kundeId);
+        if (entity is null) return 0;
+
+        db.Kunden.Remove(entity);
+        return db.SaveChanges();
     }
 }
 
@@ -324,7 +276,6 @@ public class CustomerLookup
 {
     public int Id { get; set; }
     public string Name { get; set; } = "";
-
     public override string ToString() => $"{Id} - {Name}";
 }
 
