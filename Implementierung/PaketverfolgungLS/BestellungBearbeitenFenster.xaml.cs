@@ -1,16 +1,14 @@
-using Microsoft.Data.SqlClient;
 using System;
 using System.Linq;
 using System.Windows;
-using System.Windows.Controls;
+using Paketverfolgung.Models;
 
 namespace Paketverfolgung;
 
 public partial class BestellungBearbeitenFenster : Window
 {
     private readonly int _orderId;
-    private int _customerId;
-
+    private int _currentCustomerId;
     public BestellungBearbeitenFenster(int orderId)
     {
         InitializeComponent();
@@ -21,9 +19,11 @@ public partial class BestellungBearbeitenFenster : Window
     {
         try
         {
+            
             var customers = Database.GetCustomerLookup();
             CbCustomer.ItemsSource = customers;
 
+            
             var order = Database.GetOrderById(_orderId);
             if (order is null)
             {
@@ -32,49 +32,27 @@ public partial class BestellungBearbeitenFenster : Window
                 Close();
                 return;
             }
+            
+            
+            _currentCustomerId = order.CustomerId;
 
-            _customerId = order.CustomerId;
-
+            
             TbOrderId.Text = order.Id.ToString();
             TbProduct.Text = order.Product;
             DpOrderDate.SelectedDate = order.OrderDate;
 
+            
             var selected = customers.FirstOrDefault(c => c.Id == order.CustomerId);
             if (selected != null)
                 CbCustomer.SelectedItem = selected;
 
             SelectStatus(order.Status);
         }
-        catch (SqlException ex)
-        {
-            MessageBox.Show(ex.Message, "DB Fehler");
-            Close();
-        }
         catch (Exception ex)
         {
-            MessageBox.Show(ex.Message, "Fehler");
+            MessageBox.Show("Fehler beim Laden der Daten: " + ex.Message, "Fehler");
             Close();
         }
-    }
-
-    private void SelectStatus(string status)
-    {
-        var s = (status ?? "").Trim();
-
-        foreach (var item in CbStatus.Items)
-        {
-            if (item is ComboBoxItem cbi)
-            {
-                var text = (cbi.Content?.ToString() ?? "").Trim();
-                if (string.Equals(text, s, StringComparison.OrdinalIgnoreCase))
-                {
-                    CbStatus.SelectedItem = cbi;
-                    return;
-                }
-            }
-        }
-
-        CbStatus.SelectedIndex = 0;
     }
 
     private void BtnSave_Click(object sender, RoutedEventArgs e)
@@ -84,36 +62,28 @@ public partial class BestellungBearbeitenFenster : Window
             var product = (TbProduct.Text ?? "").Trim();
             if (product.Length == 0)
             {
-                MessageBox.Show("Produktname ist Pflicht.", "Fehler");
+                MessageBox.Show("Produktname darf nicht leer sein.", "Eingabefehler");
                 return;
             }
 
             var date = DpOrderDate.SelectedDate ?? DateTime.Today;
+            var status = (CbStatus.SelectionBoxItem as string) ?? "in Bearbeitung";
 
-            var status = (CbStatus.Text ?? "").Trim();
-            if (status.Length == 0)
-            {
-                MessageBox.Show("Bitte Status wählen.", "Fehler");
-                return;
-            }
+            
+            var rows = Database.UpdateOrder(_orderId, _currentCustomerId, date, status, product);
 
-            var rows = Database.UpdateOrder(_orderId, _customerId, date, status, product);
             if (rows == 0)
             {
-                MessageBox.Show("Update hat nichts geändert (Bestellung nicht gefunden).", "Info");
+                MessageBox.Show("Die Bestellung konnte nicht aktualisiert werden.", "Info");
                 return;
             }
 
             DialogResult = true;
             Close();
         }
-        catch (SqlException ex)
-        {
-            MessageBox.Show(ex.Message, "DB Fehler");
-        }
         catch (Exception ex)
         {
-            MessageBox.Show(ex.Message, "Fehler");
+            MessageBox.Show("Fehler beim Speichern: " + ex.Message, "Fehler");
         }
     }
 
@@ -133,20 +103,37 @@ public partial class BestellungBearbeitenFenster : Window
             var rows = Database.DeleteOrder(_orderId);
             if (rows == 0)
             {
-                MessageBox.Show("Löschen hat nichts geändert (Bestellung nicht gefunden).", "Info");
+                MessageBox.Show("Bestellung wurde bereits gelöscht oder nicht gefunden.", "Info");
                 return;
             }
 
             DialogResult = true;
             Close();
         }
-        catch (SqlException ex)
-        {
-            MessageBox.Show(ex.Message, "DB Fehler");
-        }
         catch (Exception ex)
         {
-            MessageBox.Show(ex.Message, "Fehler");
+            ShowErrorMessage("Fehler beim Speichern", ex);
+        }
+    }
+    private void ShowErrorMessage(string title, Exception ex)
+    {
+        
+        string msg = ex.Message;
+        if (ex.InnerException != null)
+            msg += "\n\nDetails: " + ex.InnerException.Message;
+
+        MessageBox.Show(msg, title, MessageBoxButton.OK, MessageBoxImage.Error);
+    }
+
+    private void SelectStatus(string status)
+    {
+        foreach (System.Windows.Controls.ComboBoxItem item in CbStatus.Items)
+        {
+            if (item.Content.ToString() == status)
+            {
+                CbStatus.SelectedItem = item;
+                break;
+            }
         }
     }
 
