@@ -1,0 +1,30 @@
+name: .NET Desktop CI
+
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  pull_request:
+    branches: [ "main", "master" ]
+
+jobs:
+  build-and-test:
+    runs-on: windows-latest
+
+    steps:
+    - name: Code auschecken
+      uses: actions/checkout@v4
+
+    - name: .NET Setup
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '9.0.x' 
+
+    - name: Abhängigkeiten wiederherstellen
+      run: dotnet restore
+
+    - name: Projekt bauen
+      run: dotnet build --configuration Release --no-restore
+
+    - name: Unit Tests ausführen
+      run: dotnet test --configuration Release --no-build --verbosity normal
