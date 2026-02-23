@@ -26,7 +26,11 @@ jobs:
           dotnet restore $sln.FullName
 
     - name: Projekt bauen
-      run: dotnet build --configuration Release --no-restore
+      run: |
+           $sln = Get-ChildItem -Recurse -Filter *.sln | Select-Object -First 1
+           dotnet build $sln.FullName --no-restore --configuration Release
 
     - name: Unit Tests ausführen
-      run: dotnet test --configuration Release --no-build --verbosity normal
+      run: |
+            $sln = Get-ChildItem -Recurse -Filter *.sln | Select-Object -First 1
+            dotnet test $sln.FullName --no-build --verbosity normal
