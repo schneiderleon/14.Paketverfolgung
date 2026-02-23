@@ -21,7 +21,9 @@ jobs:
         dotnet-version: '9.0.x' 
 
     - name: Abhängigkeiten wiederherstellen
-      run: dotnet restore
+      run: |
+          $sln = Get-ChildItem -Recurse -Filter *.sln | Select-Object -First 1
+          dotnet restore $sln.FullName
 
     - name: Projekt bauen
       run: dotnet build --configuration Release --no-restore
