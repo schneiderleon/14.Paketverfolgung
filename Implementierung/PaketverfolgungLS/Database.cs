@@ -3,12 +3,14 @@ using Paketverfolgung.Models;
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Globalization;DeletedRowInaccessibleException 
+using System.Globalization;
 
 namespace Paketverfolgung;
 
 public static class Database
 {
+
+
     public static void EnsureCreatedAndSeeded()
     {
         using var db = new PaketverfolgungContext();
