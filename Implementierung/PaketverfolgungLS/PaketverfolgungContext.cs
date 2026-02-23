@@ -12,9 +12,15 @@ public class PaketverfolgungContext : DbContext
     public const string ConnectionString =
         @"Server=(localdb)\MSSQLLocalDB;Database=PaketverfolgungDB;Trusted_Connection=True;TrustServerCertificate=True";
 
+    public PaketverfolgungContext() { }
+    public PaketverfolgungContext(DbContextOptions<PaketverfolgungContext> options)
+        : base(options) { }
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        optionsBuilder.UseSqlServer(ConnectionString);
+        if (!optionsBuilder.IsConfigured)
+        {
+            optionsBuilder.UseSqlServer(ConnectionString);
+        }
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
